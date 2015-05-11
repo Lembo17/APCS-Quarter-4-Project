@@ -4,6 +4,7 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
 public class CalendarProgram{
     static JLabel lblMonth, lblYear;
     static JButton btnPrev, btnNext;
@@ -15,6 +16,7 @@ public class CalendarProgram{
     static JScrollPane stblCalendar; //The scrollpane
     static JPanel pnlCalendar;
     static int realYear, realMonth, realDay, currentYear, currentMonth;
+
     public static void main (String args[]){
         //Look and feel
         try {UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}
@@ -45,9 +47,9 @@ public class CalendarProgram{
         pnlCalendar.setBorder(BorderFactory.createTitledBorder("Calendar"));
 
         //Register action listeners
-        //***btnPrev.addActionListener(new btnPrev_Action());
-        //***btnNext.addActionListener(new btnNext_Action());
-        //***cmbYear.addActionListener(new cmbYear_Action());
+        btnPrev.addActionListener(new btnPrev_Action());
+        btnNext.addActionListener(new btnNext_Action());
+        cmbYear.addActionListener(new cmbYear_Action());
 
         //Add controls to pane
         pane.add(pnlCalendar);
@@ -107,8 +109,9 @@ public class CalendarProgram{
         }
 
         //Refresh calendar
-        //***refreshCalendar (realMonth, realYear); //Refresh calendar
+        refreshCalendar (realMonth, realYear); //Refresh calendar
     }
+
     public static void refreshCalendar(int month, int year){
         //Variables
         String[] months =  {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -143,6 +146,60 @@ public class CalendarProgram{
         }
 
         //Apply renderers
-        //****tblCalendar.setDefaultRenderer(tblCalendar.getColumnClass(0), new tblCalendarRenderer());
+        tblCalendar.setDefaultRenderer(tblCalendar.getColumnClass(0), new tblCalendarRenderer());
+    }
+
+    static class tblCalendarRenderer extends DefaultTableCellRenderer{
+        public Component getTableCellRendererComponent (JTable table, Object value, boolean selected, boolean focused, int row, int column){
+            super.getTableCellRendererComponent(table, value, selected, focused, row, column);
+            if (column == 0 || column == 6){ //Week-end
+                setBackground(new Color(255, 220, 220));
+            }
+            else{ //Week
+                setBackground(new Color(255, 255, 255));
+            }
+            if (value != null){
+                if (Integer.parseInt(value.toString()) == realDay && currentMonth == realMonth && currentYear == realYear){ //Today
+                    setBackground(new Color(220, 220, 255));
+                }
+            }
+            setBorder(null);
+            setForeground(Color.black);
+            return this;  
+        }
+    }
+
+    static class btnPrev_Action implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            if (currentMonth == 0){ //Back one year
+                currentMonth = 11;
+                currentYear -= 1;
+            }
+            else{ //Back one month
+                currentMonth -= 1;
+            }
+            refreshCalendar(currentMonth, currentYear);
+        }
+    }
+    static class btnNext_Action implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            if (currentMonth == 11){ //Foward one year
+                currentMonth = 0;
+                currentYear += 1;
+            }
+            else{ //Foward one month
+                currentMonth += 1;
+            }
+            refreshCalendar(currentMonth, currentYear);
+        }
+    }
+    static class cmbYear_Action implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            if (cmbYear.getSelectedItem() != null){
+                String b = cmbYear.getSelectedItem().toString();
+                currentYear = Integer.parseInt(b);
+                refreshCalendar(currentMonth, currentYear);
+            }
+        }
     }
 }
